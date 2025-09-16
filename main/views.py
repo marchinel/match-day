@@ -8,9 +8,9 @@ def show_main(request):
     product_list = Product.objects.all()
 
     context = {
-        'npm' : '240123456',
-        'name': 'Haru Urara',
-        'class': 'PBP A',
+        'npm' : '2406356510',
+        'name': 'Naila Shafa Azizah',
+        'class': 'PBP D',
         'product_list': product_list
     }
 

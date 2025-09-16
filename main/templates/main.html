@@ -28,12 +28,12 @@
     <br />
     {% endif %}
 
-    <h2>{% if product.is_product_popular %} Popular {% endif %} | <a href="{% url 'main:show_product' product.id %}">{{ product.name }}</a></h2>
+    <h2><small>{% if product.is_featured %} Featured | {% endif %}</small> <a href="{% url 'main:show_product' product.id %}">{{ product.name }}</a></h2>
 
     <h2>Rp{{ product.price }}</h2>
 
-    <p><b>{{ product.get_category_display }}</b>{% if product.is_featured %} | 
-    <b>Featured</b>{% endif %} | Rating: {{ product.rating }}/5.0</p>
+    <p><b>{% if product.is_product_popular %} Popular in 
+    {% endif %} {{ product.get_category_display }}</b> | Rating: {{ product.rating }}/5.0</p>
 
     <p>{{ product.description|truncatewords:25 }}...</p>
 

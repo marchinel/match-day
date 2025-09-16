@@ -1,3 +1,5 @@
+-- TUGAS 2 --
+
 Tautan menuju aplikasi PWS:
 https://naila-shafa41-matchday.pbp.cs.ui.ac.id/
 
@@ -38,3 +40,41 @@ Menurut saya, Django sering dijadikan permulaan pembelajaran pengembangan perang
 6. Apakah ada feedback untuk asisten dosen tutorial 1 yang telah kamu kerjakan sebelumnya?
 
 Untuk saya, tutorial 1 sangat membantu dan mudah dipahami.
+
+-- TUGAS 3 --
+
+1. Jelaskan mengapa kita memerlukan data delivery dalam pengimplementasian sebuah platform?
+
+Data delivery adalah proses mengirimkan, mendistribusikan, dan menyajikan data dari satu titik ke titik lain, misalnya dari server ke pengguna. Data delivery penting dalam pengimplementasian platform adalah karena:
+    - Platform berguna jika datanya bisa sampai ke pengguna, tanpa mekanisme pengiriman data, informasi akan terkunci di server dan tidak bisa dimanfaatkan.
+    - Data delivery memungkinkan platform menyajikan informasi secara real-time.
+    - Mekanisme data delivery yang baik akan memastikan setiap pengguna platform melihat data yang sama dan terbaru tanpa konflik.
+    - Data delivery juga berkaitan dengan proteksi terhadap data saat dikirimkan agar data tidak hilang atau rusak saat dipindahkan.
+    - Platform seringkali harus berkomunikasi dengan aplikasi lain, sehingga membutuhkan mekanisme data delivery yang standar agar integrasi bisa dilakukan.
+
+2.  Menurutmu, mana yang lebih baik antara XML dan JSON? Mengapa JSON lebih populer dibandingkan XML?
+
+Menurut saya, JSON lebih baik, terutama dalam hal readability, kecepatan, serta keringanan yang membuat hemat bandwidth dan performa aplikasi lebih baik. Selain itu, JSON terintegrasi langsung dengan JavaScript yang sangat cocok untuk web API dan aplikasi web modern, serta didukung hampir semua framework modern. Kelebihan-kelebihan inilah yang membuat JSON lebih populer dibandingkan XML.  
+
+3. Jelaskan fungsi dari method is_valid() pada form Django dan mengapa kita membutuhkan method tersebut?
+
+Untuk melakukan validasi terhadap data yang dikirim user sesuai dengan aturan yang sudah didefinisikan di form. Tanpa validasi, data yang masuk ke sistem bisa salah format, kosong padahal wajib, atau bahkan berbahaya.
+Method is_valid() menyederhanakan proses validasi tersebut, sehingga kita tidak perlu menulis ulang logika validasi.
+
+4. Mengapa kita membutuhkan csrf_token saat membuat form di Django? Apa yang dapat terjadi jika kita tidak menambahkan csrf_token pada form Django? Bagaimana hal tersebut dapat dimanfaatkan oleh penyerang?
+
+Tujuan csrf_token adalah untuk melindungi aplikasi dari serangan CSRF (Cross-Site Request Forgery). Dengan token ini, Django bisa memastikan bahwa permintaan POST benar-benar berasal dari user yang sah melalui form dari website kita, bukan dari sumber lain yang berusaha menipu user.
+
+Jika kita tidak menambahkan csrf_token, aplikasi jadi rentan terhadap CSRF karena server tidak bisa membedakan apakah request datang dari website asli atau dari situs berbahaya. Selain itu, user bisa tanpa sadar melakukan aksi berbahaya melalui program yang diam-diam mengirimkan request POST.
+
+Ketiadaan csrf_token dimanfaatkan oleh penyerang dengan cara berikut:
+    - Menyisipkan form palsu di website lain. Penyerang membuat form    HTML di situsnya yang kelihatannya tidak berbahaya. Saat korban yang sudah login di situs asli membuka situs penyerang, form palsu itu otomatis terkirim ke server asli menggunakan session korban.
+    - Memanfaatkan session/cookie korban, karena browser otomatis mengirim cookie session saat mengakses domain asli, server menganggap request dari form palsu itu sah. Tanpa csrf_token, server tidak bisa mendeteksi bahwa request itu palsu.
+
+5. Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
+
+6. Apakah ada feedback untuk asdos di tutorial 2 yang sudah kalian kerjakan?
+
+Screenshot dari hasil akses URL pada Postman
+- XML: https://drive.google.com/file/d/1iP5bL9lv4v8huaLn2nu_Blq8BoSPEayO/view?usp=sharing
+- json: https://drive.google.com/file/d/1qj5GQviIS2MOTFXaLMcH8IDYO6SU8EWG/view?usp=sharing
