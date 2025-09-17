@@ -73,7 +73,23 @@ Ketiadaan csrf_token dimanfaatkan oleh penyerang dengan cara berikut:
 
 5. Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
 
+Pertama-tama, saya membuka berkas views.py pada app main dan menambahkan empat fungsi baru bernama show_xml, show_json, show_xml_by_id, dan show_json_by_id. Masing-masing fungsi saya buat untuk melakukan query ke model News, baik seluruh data maupun data berdasarkan id, kemudian hasilnya saya serialisasi menggunakan serializers.serialize() dan mengembalikannya dengan HttpResponse yang sudah saya atur content_type-nya menjadi "application/xml" atau "application/json" sesuai format yang dibutuhkan. 
+
+Selanjutnya, saya mengatur routing dengan membuka urls.py, meng-import keempat fungsi tadi, lalu menambahkan path URL seperti xml/, json/, xml/<str:id>/, dan json/<str:id>/ ke dalam urlpatterns agar setiap view dapat diakses melalui endpoint masing-masing. Setelah itu saya menjalankan server Django dengan perintah python manage.py runserver, lalu menggunakan Postman untuk mengirim request GET ke keempat URL tersebut. Saya memastikan respon yang diterima sudah sesuai format XML maupun JSON, kemudian mengambil tangkapan layar dari setiap hasil, dan menambahkannya ke dalam berkas README.md sebagai dokumentasi.
+
+Setelah itu, saya membuat kerangka template base.html di folder templates sebagai skeleton agar semua halaman memiliki desain yang konsisten. Saya memperbarui settings.py pada bagian TEMPLATES dengan menambahkan BASE_DIR / 'templates' ke dalam DIRS supaya base.html dapat dikenali sebagai template dasar.
+
+Setelah itu, saya menyiapkan routing URL untuk setiap view. Pada berkas urls.py di app main, saya mengimpor fungsi show_main, create_product, dan show_product, lalu menambahkan path baru seperti path('', show_main, name='show_main'), path('create/', create_product, name='create_product'), dan path('product/<int:id>/', show_product, name='show_product') ke dalam urlpatterns agar halaman utama, form input, dan detail berita bisa diakses melalui URL masing-masing.
+
+Langkah berikutnya, saya membuat halaman utama yang menampilkan daftar product. Saya mengubah main.html agar meng-extend base.html dan menampilkan data objek model menggunakan loop for. Di bagian atas halaman, saya menambahkan tombol “+ Add Product” yang mengarah ke URL create_product, sedangkan setiap item berita dilengkapi tautan judul dan tombol See Details menuju halaman detail show_product sesuai ID product.
+
+Selanjutnya, saya menyiapkan halaman form untuk menambahkan objek model. Saya membuat forms.py dan mendefinisikan Product Form berbasis ModelForm. Di views.py saya menambahkan fungsi create_product yang memproses input form dan menyimpan data ke database ketika request adalah POST, serta merender template create_product.html jika belum disubmit. Saya juga menambahkan fungsi show_product untuk menampilkan detail berita dengan get_object_or_404 dan merender product_detail.html. Kedua template tersebut saya buat di folder main/templates untuk menampilkan form input dan detail berita.
+
+Terakhir, saya menjalankan server dengan python manage.py runserver, menambahkan beberapa data product melalui form, dan menguji seluruh alur dari halaman utama, tombol Add Product, hingga halaman detail setiap product. Setelah melakukan beberapa penyesuaian tampilan web melalui main.html dan detail_product.html, saya melakukan add commit dan push ke GitHub maupun ke PWS.
+
 6. Apakah ada feedback untuk asdos di tutorial 2 yang sudah kalian kerjakan?
+
+Tidak ada, tutorial 2 sudah jelas.
 
 Screenshot dari hasil akses URL pada Postman
 - XML: https://drive.google.com/file/d/1iP5bL9lv4v8huaLn2nu_Blq8BoSPEayO/view?usp=sharing
