@@ -94,3 +94,65 @@ Tidak ada, tutorial 2 sudah jelas.
 Screenshot dari hasil akses URL pada Postman
 - XML: https://drive.google.com/file/d/1iP5bL9lv4v8huaLn2nu_Blq8BoSPEayO/view?usp=sharing
 - json: https://drive.google.com/file/d/1qj5GQviIS2MOTFXaLMcH8IDYO6SU8EWG/view?usp=sharing
+
+-- TUGAS 4 --
+
+1. Apa itu Django AuthenticationForm? Jelaskan juga kelebihan dan kekurangannya.
+
+AuthenticationForm adalah form bawaan Django yang dipakai untuk proses login pengguna. Form ini disediakan oleh modul django.contrib.auth.forms. Secara default, AuthenticationForm menyediakan dua field utama, yaituusername dan password, serta otomatis melakukan validasi terhadap kredensial pengguna.
+
+Ketika user mengisi username dan password, AuthenticationForm akan mengecek apakah user dengan username tersebut ada, memastikan password yang dimasukkan cocok dan memastikan akun aktif (bukan is_active=False).
+
+Kelebihan:
+    1. Sudah ada di Django. Tidak perlu menulis logika validasi dari nol.
+    2. Integrasi dengan sistem auth Django yang langsung terhubung dengan model User dan mekanisme sesi (session).
+    3. Keamanan terjamin dengan mendukung proteksi CSRF, hashed password, dan validasi standar yang aman.
+    4. Mudah dikustomisasi dengan menambah field atau menyesuaikan tampilan lewat subclassing.
+
+Kekurangan:
+    1. Terbatas pada username/password. Jika ingin login dengan email, OTP, atau social login, perlu kustom tambahan.
+    2. Tampilan standar sederhana dan butuh penyesuaian CSS/HTML agar sesuai desain.
+    3. Validasi default kaku. Misalnya, pesan error bawaan mungkin perlu diubah untuk UX yang lebih ramah.
+
+2. Apa perbedaan antara autentikasi dan otorisasi? Bagaimana Django mengimplementasikan kedua konsep tersebut?
+
+Autentikasi adalah proses untuk memverifikasi identitas pengguna, memastikan bahwa orang yang masuk ke sistem memang benar siapa yang ia klaim. Misalnya, saat pengguna mengisi username dan password, Django memeriksa kecocokan data dengan informasi yang tersimpan di database. Sedangkan otorisasi, terjadi setelah autentikasi berhasil. Proses ini menentukan hak akses pengguna, yaitu apa saja yang boleh dan tidak boleh dilakukan, seperti hanya admin yang dapat menghapus data atau mengubah pengaturan tertentu.
+
+Django mengimplementasikan autentikasi melalui authentication framework bawaan (django.contrib.auth). Framework ini menyediakan model User untuk menyimpan data pengguna dengan password yang di-hash, fungsi authenticate() dan login() untuk memvalidasi kredensial, serta session middleware agar status login tersimpan antar permintaan (request). Setelah identitas diverifikasi, mekanisme otorisasi Django mengelola izin dengan sistem permissions dan groups, flag khusus seperti is_staff dan is_superuser, serta dekorator atau mixin seperti @login_required dan @permission_required. Dengan kombinasi ini, Django memastikan hanya pengguna yang sah dan memiliki hak yang tepat yang dapat mengakses atau memodifikasi sumber daya tertentu.
+ 
+3. Apa saja kelebihan dan kekurangan session dan cookies dalam konteks menyimpan state di aplikasi web?
+
+Cookies
+Kelebihan:
+    1. Sederhana & langsung di klien, data disimpan di browser, jadi server tidak perlu ruang tambahan.
+    2. Bertahan lama dan bisa disetel agar tetap ada walau browser ditutup (misalnya untuk fitur “Remember Me”).
+    3. Bisa diakses client-side, yaitu JavaScript dapat membaca atau mengubah nilai cookie jika diizinkan.
+Kekurangan
+    1. Keamanan lebih rentan, yaitu data berada di sisi klien, berpotensi dibaca atau dimodifikasi jika tidak di-encrypt dan tanpa flag HttpOnly/Secure.
+    2. Ukuran terbatas, biasanya maksimal sekitar 4 KB per cookie.
+    3. Overhead jaringan, Cookie ikut terkirim di setiap request/response, menambah beban trafik.
+
+Session
+Kelebihan:
+    1. Lebih aman, lkarena data sensitif disimpan di server; browser hanya menyimpan ID session acak.
+    2. Dapat menyimpan data besar/kompleks tidak dibatasi 4 KB seperti cookie.
+    3. Integrasi mudah dengan autentikasi, cocok untuk login, keranjang belanja, dan data sementara lain.
+
+Kekurangan:
+    1. Membutuhkan penyimpanan server, butuh memori atau database untuk menyimpan session aktif.
+    2. Masa hidup terbatas, biasanya berakhir ketika browser ditutup atau setelah timeout.
+    3. Manajemen skala lebih rumit. Pada aplikasi multi-server perlu mekanisme session sharing (misalnya Redis).
+
+4. Apakah penggunaan cookies aman secara default dalam pengembangan web, atau apakah ada risiko potensial yang harus diwaspadai? Bagaimana Django menangani hal tersebut?
+
+Penggunaan cookies tidak otomatis aman secara default, karena cookie disimpan di sisi klien (browser). Jika tidak dikonfigurasi dengan benar, cookie bisa menjadi titik lemah bagi serangan seperti session hijacking, cross-site scripting (XSS), atau cross-site request forgery (CSRF). Misalnya, cookie yang tidak di-encrypt dapat disadap melalui jaringan yang tidak aman, atau diakses JavaScript berbahaya jika tidak diberi flag HttpOnly. Cookie juga selalu terkirim bersama setiap request ke domain terkait, sehingga jika tidak dibatasi dengan SameSite atau Secure, bisa dimanfaatkan pihak ketiga.
+
+Django mengantisipasi risiko ini dengan beberapa mekanisme bawaan. Saat menggunakan session berbasis cookie (django.contrib.sessions), Django hanya menaruh ID session yang di-sign di browser, bukan data sensitif langsung. Framework ini memverifikasi tanda tangan digital setiap cookie untuk mencegah pemalsuan. Selain itu, developer dapat mengaktifkan pengaturan keamanan seperti:
+    - SESSION_COOKIE_SECURE = True agar cookie hanya terkirim melalui HTTPS.
+    - SESSION_COOKIE_HTTPONLY = True agar cookie tidak bisa diakses JavaScript.
+    - CSRF_COOKIE_SECURE dan CSRF_COOKIE_HTTPONLY untuk proteksi token CSRF.
+    - SESSION_COOKIE_SAMESITE untuk mencegah pengiriman cookie lintas situs.
+
+Dengan konfigurasi ini, Django memberi lapisan perlindungan yang kuat. Tetapi, keamanan tetap tergantung pada developer untuk memastikan opsi-opsi tersebut diaktifkan dan lingkungan server menggunakan HTTPS.
+
+5. Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
