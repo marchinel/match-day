@@ -28,4 +28,3 @@ class Product(models.Model):
     @property
     def is_product_popular(self):
         return self.rating >= 4.5
-

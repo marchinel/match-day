@@ -170,3 +170,62 @@ Langkah selanjutnya adalah menghubungkan model Product dengan User. Pada models.
 Setelah struktur tersebut selesai, saya membuat dua akun pengguna secara lokal menggunakan halaman registrasi yang sudah saya buat. Setelah kedua akun berhasil dibuat, saya menambahkan masing-masing tiga data produk dummy menggunakan model Product. Data dummy ini dapat dibuat melalui halaman form produk atau langsung melalui Django shell. Dengan begitu, setiap akun memiliki tiga data produk yang berbeda.
 
 Terakhir, saya memastikan bahwa pada halaman utama aplikasi, pengguna yang sedang login dapat melihat detail informasi seperti username mereka sendiri, daftar produk yang dimiliki, serta waktu terakhir login yang disimpan di cookie last_login. Saya juga menambahkan tombol filter agar pengguna dapat memilih menampilkan semua data produk (All Products) atau hanya produk milik akun yang sedang login (My Products).
+
+-- TUGAS 5 --
+
+1. Jika terdapat beberapa CSS selector untuk suatu elemen HTML, jelaskan urutan prioritas pengambilan CSS selector tersebut!
+
+    Jika terdapat beberapa CSS selector untuk suatu elemen HTML, urutan aturan yang dipilih adalah berdasarkan Specificity (tingkat kekhususan) dan urutan deklarasi, yaitu sebagai berikut:
+
+    1. !important
+    Jika sebuah aturan diberi !important, dia akan mengalahkan aturan lain meskipun specificity-nya lebih rendah, kecuali ada aturan lain dengan !important juga (akan dicek lagi berdasarkan specificity & urutan penulisan).
+
+    2. ⁠Inline Style
+    ⁠CSS yang ditulis langsung di atribut elemen HTML Ini punya prioritas paling tinggi (kecuali ada !important)
+
+    Contoh:
+    <p style="color: red;">Teks</p>
+
+    3. ID Selector
+    Contoh:
+    ⁠#judul {
+    color: blue;
+    }
+
+    4. Class, Attribute, dan Pseudo-class Selector
+    Contoh:
+    .kotak { color: green; }
+    [type="text"] { ... }
+    :hover { ... }
+
+    5. Element dan Pseudo-element Selector
+    Contoh:
+    ⁠p { color: black; }
+    h1 { ... }
+    ::after { ... }
+
+    6. Urutan Penulisan (Source Order)
+    Jika ada dua selector mempunyai s⁠pecificity yang sama, selector yang ditulis paing terakhir di file CSS lebih tinggi prioritasnya.
+
+2. Mengapa responsive design menjadi konsep yang penting dalam pengembangan aplikasi web? Berikan contoh aplikasi yang sudah dan belum menerapkan responsive design, serta jelaskan mengapa!
+
+Responsive design adalah pendekatan desain web agar tampilan aplikasi bisa menyesuaikan diri dengan berbagai ukuran layar (HP, tablet, laptop, monitor besar).
+
+Responsive design penting, karena:
+    1. User experience (kenyamanan pengguna)
+    Pengguna tidak perlu zoom in/out atau scroll horizontal
+    2. Aksesibilitas luas
+    Semakin banyak???????????????
+    3. ⁠SEO friendly
+    ⁠Google memberi prioritas pada website yang mobile-friendly.
+    4. Efisiensi pengembangan
+    ⁠1 kode bisa dipakai lintas device, nggak perlu bikin versi mobile dan desktop terpisah.
+
+⁠Contoh web/aplikasi yang sudah responsive adalah tokopedia. Saat diakses lewat laptop, tampilannya full dengan sidebar dan banner. Saat diakses lewat hp, layout berubah, yaitu produk ditampilkan satu kolom dengan tombol kecil susah ditekan. Alasannya, tokopedia merupakan aplikasi e-commerce yang pastinya dengan menggunakna responsive design, customer bisa belanja di mana saja dengan nyaman.
+
+Contoh web/aplikasi yang belum responsive adalah SIAK-NG. Di laptop, website nromal dan mudah dibaca. Sedangkan di HP, tampilan terpotong, sehingga harus scroll horizontal dan tombol kecil susah ditekan.
+
+
+3. Jelaskan perbedaan antara margin, border, dan padding, serta cara untuk mengimplementasikan ketiga hal tersebut!
+4. Jelaskan konsep flex box dan grid layout beserta kegunaannya!
+5. Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial)!

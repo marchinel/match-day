@@ -1,0 +1,80 @@
+{% load static %}
+{% load humanize %}
+
+<article class="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col h-full">
+
+  <!-- Thumbnail -->
+  <div class="aspect-square relative overflow-hidden bg-gray-100 flex items-center justify-center">
+    {% if product.thumbnail %}
+      <img src="{{ product.thumbnail }}" alt="{{ product.name }}" class="w-full h-full object-contain">
+    {% elif product.image %}
+      <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-contain">
+    {% else %}
+      <div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
+        No Image
+      </div>
+    {% endif %}
+
+    <!-- Category Badge -->
+    <div class="absolute top-3 left-3">
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-green-600 text-white">
+        {{ product.get_category_display }}
+      </span>
+    </div>
+
+    <!-- Status Badges -->
+    <div class="absolute top-3 right-3 flex space-x-2">
+      {% if product.is_featured %}
+        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+          Featured
+        </span>
+      {% endif %}
+      {% if product.is_product_popular %}
+        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800">
+          Popular
+        </span>
+      {% endif %}
+    </div>
+  </div>
+
+
+  <!-- Content -->
+  <div class="p-4 flex flex-col flex-grow">
+    <!-- Nama Produk -->
+    <h2 class="text-lg text-gray-900 mb-1">{{ product.name }}</h2>
+
+    <!-- Harga -->
+    <p class="text-xl font-bold text-gray-900 mb-2">
+      Rp {{ product.price|intcomma }}
+    </p>
+
+    <!-- Rating -->
+    <div class="flex items-center">
+      <span class="text-yellow-500 text-lg">★</span>
+      <span class="ml-2 text-gray-800 text-base">{{ product.rating }}</span>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mt-auto pt-4 border-t border-gray-100">
+      {% if user.is_authenticated and product.user == user %}
+        <div class="flex items-center justify-between">
+          <a href="{% url 'main:show_product' product.id %}" class="text-green-600 hover:text-green-700 font-medium text-sm transition-colors">
+            See Details
+          </a>
+          <div class="flex space-x-2">
+            <a href="{% url 'main:edit_product' product.id %}" class="text-gray-600 hover:text-gray-700 text-sm transition-colors">
+              Edit
+            </a>
+            <a href="{% url 'main:delete_product' product.id %}" class="text-red-600 hover:text-red-700 text-sm transition-colors">
+              Delete
+            </a>
+          </div>
+        </div>
+      {% else %}
+        <a href="{% url 'main:show_product' product.id %}" class="text-green-600 hover:text-green-700 font-medium text-sm transition-colors">
+          See Details 
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</article>
