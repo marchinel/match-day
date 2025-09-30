@@ -1,19 +1,35 @@
+{% load static %}
 <nav class="fixed top-0 left-0 w-full bg-white border-b border-gray-200 shadow-sm z-50">
     <div class="max-w-7xl mx-auto px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center">
-          <h1 class="text-xl font-semibold text-gray-900">
-            <span class="text-green-600">MATCH</span> DAY
-          </h1>
+          <a href="{% url 'main:show_main' %}" class="flex items-center space-x-2">
+              <img src="{% static 'image/logo.png' %}" alt="Logo" class="h-8 w-8 object-contain">
+              <h1 class="text-2xl font-semibold text-gray-900">
+                <span class="text-green-700">MATCH DAY</span>
+              </h1>
+            </a>
         </div>
         
         <!-- Desktop Navigation -->
         <div class="hidden md:flex items-center space-x-8">
-          <a href="/" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+          <a href="/" class="text-gray-600 hover:text-green-800 font-medium transition-colors">
             Home
           </a>
-          <a href="{% url 'main:create_product' %}" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">
-            Create Product
+          <a href="{% url 'main:products_by_category' 'jersey'%}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+            Jersey
+          </a>
+          <a href="{% url 'main:products_by_category' 'sepatu'%}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+            Sepatu
+          </a>
+          <a href="{% url 'main:products_by_category' 'aksesoris'%}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+            Aksesoris
+          </a>
+          <a href="{% url 'main:products_by_category' 'merchandise'%}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+            Merchandise
+          </a>
+          <a href="{% url 'main:create_product' %}" class="text-gray-600 hover:text-green-700 font-medium transition-colors">
+           Add Product
           </a>
         </div>
         
@@ -55,11 +71,23 @@
       <div class="px-6 py-4 space-y-4">
         <!-- Mobile Navigation Links -->
         <div class="space-y-1">
-          <a href="/" class="block text-gray-600 hover:text-gray-900 font-medium py-3 transition-colors">
+          <a href="/" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
             Home
           </a>
-          <a href="{% url 'main:create_product' %}" class="block text-gray-600 hover:text-gray-900 font-medium py-3 transition-colors">
-            Create Product
+          <a href="{% url 'main:products_by_category' 'jersey'%}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+            Jersey
+          </a>
+          <a href="{% url 'main:products_by_category' 'sepatu'%}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+            Sepatu
+          </a>
+          <a href="{% url 'main:products_by_category' 'aksesoris'%}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+            Aksesoris
+          </a>
+          <a href="{% url 'main:products_by_category' 'merchandise'%}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+            Merchandise
+          </a>
+          <a href="{% url 'main:create_product' %}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+            Add Product
           </a>
         </div>
         

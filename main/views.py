@@ -140,3 +140,18 @@ def delete_product(request, id):
     product = get_object_or_404(Product, pk=id)
     product.delete()
     return HttpResponseRedirect(reverse('main:show_main'))
+
+@login_required(login_url='/login')
+def products_by_category(request, category):
+    filter_type = request.GET.get("filter", "all") 
+
+    if filter_type == "all":
+        product_list = Product.objects.filter(category=category)
+    else:
+        product_list = Product.objects.filter(category=category, user=request.user)
+
+    context = {
+        "product_list": product_list,
+        "last_login": request.COOKIES.get('last_login', 'never'),
+    }
+    return render(request, "main.html", context)
