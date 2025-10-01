@@ -183,7 +183,7 @@ Terakhir, saya memastikan bahwa pada halaman utama aplikasi, pengguna yang sedan
     2. ⁠Inline Style
     ⁠CSS yang ditulis langsung di atribut elemen HTML Ini punya prioritas paling tinggi (kecuali ada !important)
 
-    Contoh: "<p style="color: red;">Teks</p>"
+    Contoh: `<p style="color: red;">Teks</p>`
 
     3. ID Selector
     Contoh:
