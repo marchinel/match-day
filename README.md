@@ -183,8 +183,7 @@ Terakhir, saya memastikan bahwa pada halaman utama aplikasi, pengguna yang sedan
     2. ⁠Inline Style
     ⁠CSS yang ditulis langsung di atribut elemen HTML Ini punya prioritas paling tinggi (kecuali ada !important)
 
-    Contoh:
-    <p style="color: red;">Teks</p>
+    Contoh: "<p style="color: red;">Teks</p>"
 
     3. ID Selector
     Contoh:
@@ -215,7 +214,7 @@ Responsive design penting, karena:
     1. User experience (kenyamanan pengguna)
     Pengguna tidak perlu zoom in/out atau scroll horizontal
     2. Aksesibilitas luas
-    Semakin banyak???????????????
+    Semakin banyak pengguna yang menggunakan mobile membutuhkan aksesibilitas yang semakin luas.
     3. ⁠SEO friendly
     ⁠Google memberi prioritas pada website yang mobile-friendly.
     4. Efisiensi pengembangan
@@ -225,7 +224,29 @@ Responsive design penting, karena:
 
 Contoh web/aplikasi yang belum responsive adalah SIAK-NG. Di laptop, website nromal dan mudah dibaca. Sedangkan di HP, tampilan terpotong, sehingga harus scroll horizontal dan tombol kecil susah ditekan.
 
-
 3. Jelaskan perbedaan antara margin, border, dan padding, serta cara untuk mengimplementasikan ketiga hal tersebut!
+
+Margin, border, dan padding berhubungan dengan tata letak elemen pada halaman web. Margin adalah ruang kosong di luar batas elemen yang berfungsi memberi jarak antar elemen satu dengan lainnya. Border adalah garis tepi yang mengelilingi elemen, terletak di antara margin dan padding, serta dapat diberi warna, ketebalan, dan gaya. Sementara itu, padding adalah ruang kosong di dalam elemen yang memberi jarak antara isi elemen (seperti teks atau gambar) dengan garis tepi (border). 
+
+Untuk mengimplementasikan ketiganya, dapat menggunakan properti CSS, seperti margin: 20px; untuk memberikan jarak luar, border: 2px solid black; untuk membuat garis tepi hitam dengan ketebalan 2 piksel, dan padding: 10px; untuk memberikan jarak isi elemen dengan garis tepi.
+
 4. Jelaskan konsep flex box dan grid layout beserta kegunaannya!
+
+Flexbox dan Grid Layout adalah dua sistem layout dalam CSS yang memudahkan developer web mengatur posisi elemen di halaman. 
+
+Flexbox (Flexible Box Layout) digunakan untuk mengatur elemen dalam satu dimensi, baik secara baris (row) maupun kolom (column). Dengan flexbox, kita dapat dengan mudah mengatur jarak, perataan (alignment), maupun distribusi ruang antar elemen, sehingga cocok digunakan untuk membuat tata letak sederhana seperti menu navigasi, card, atau komponen yang tersusun sejajar. 
+
+Sedangkan, CSS Grid Layout bekerja dalam dua dimensi, yaitu baris dan kolom sekaligus, sehingga lebih fleksibel untuk membuat struktur halaman yang kompleks. Grid memungkinkan kita menentukan ukuran kolom dan baris secara eksplisit serta mengatur elemen agar menempati beberapa sel sekaligus, mirip dengan tabel namun jauh lebih fleksibel. Kegunaan utama flexbox adalah untuk menyusun elemen yang bersifat linier dan responsif, sedangkan grid lebih tepat dipakai untuk mengatur tata letak utama halaman atau desain dengan pola yang terstruktur.
+
 5. Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial)!
+Pertama-tama, saya memulai dengan mengimplementasikan fungsi edit product agar pengguna dapat mengubah data produk yang sudah dibuat. Pada berkas views.py di aplikasi main, saya menambahkan fungsi edit_product yang menerima parameter request dan id. Fungsi ini memanfaatkan get_object_or_404 untuk mengambil objek product berdasarkan ID yang diberikan. Jika request adalah POST dan form valid, maka perubahan data produk akan disimpan ke database, kemudian pengguna diarahkan kembali ke halaman daftar produk. Untuk menampilkan form edit, saya membuat template baru bernama edit_product.html di direktori main/templates yang berisi form dengan proteksi CSRF token. Selanjutnya, saya menambahkan path URL ke dalam urls.py agar halaman edit product dapat diakses.
+
+Setelah itu, saya melanjutkan dengan mengimplementasikan fungsi hapus product. Masih di views.py, saya membuat fungsi delete_product yang menerima parameter request dan id. Fungsi ini mengambil objek product sesuai ID, kemudian menghapusnya dari database. Setelah produk terhapus, pengguna diarahkan kembali ke halaman daftar produk menggunakan HttpResponseRedirect dan reverse. Agar fitur ini dapat diakses, saya mengimpor fungsi tersebut ke urls.py lalu menambahkan path URL baru. Kemudian, saya memodifikasi main.html pada loop daftar produk untuk menambahkan tombol “Edit” dan “Delete” di setiap card produk. Dengan begitu, setiap produk dapat diedit maupun dihapus langsung dari halaman daftar.
+
+Langkah berikutnya adalah melakukan kustomisasi desain dengan Tailwind dan CSS. Pertama, saya menambahkan file global.css di direktori /static/css yang digunakan untuk memberikan styling global pada form. Semua input form dengan class form-style akan memiliki tampilan rapi dengan lebar penuh, padding, border abu-abu, serta sudut melengkung. Saat input difokuskan, border berubah warna menjadi hijau dengan efek shadow sehingga pengguna lebih mudah mengenali input yang aktif.
+
+Kemudian, saya melakukan kustomisasi halaman login, register, tambah produk, edit produk, dan detail produk agar tampilan lebih menarik. Pada login.html dan register.html, saya menambahkan class Tailwind seperti bg-gray-100, rounded-lg, dan shadow-md agar form terlihat modern. Untuk create_product.html dan edit_product.html, saya menggunakan kombinasi form-style dari global.css dengan utility class Tailwind untuk memberikan tampilan konsisten. Sedangkan pada detail_product.html, saya menambahkan styling card dengan border, padding, dan bayangan agar detail produk tampil lebih menonjol.
+
+Selanjutnya, saya mengkustomisasi halaman daftar product agar lebih menarik dan responsif. Pertama, saya menambahkan kondisi di main.html. Jika database belum memiliki produk, halaman akan menampilkan gambar no-product.png (saya menaruhnya di direktori static/image) beserta pesan bahwa belum ada produk yang terdaftar. Jika sudah ada produk, setiap produk akan ditampilkan menggunakan card yang saya buat di card_product.html. Pada card ini, saya menambahkan tombol edit dan delete sesuai fungsionalitas yang sudah diimplementasikan sebelumnya. Dengan penggunaan Tailwind, tampilan card menjadi lebih responsif dan menyesuaikan ukuran layar perangkat.
+
+Untuk bagian navigasi, saya membuat navigation bar (navbar) pada berkas navbar.html di direktori templates. Navbar ini berisi link menuju halaman utama, halaman tambah produk, serta tombol login, register, atau logout tergantung status autentikasi pengguna. Saya menggunakan utility class Tailwind untuk membuat navbar fixed di bagian atas halaman, dengan struktur flexbox agar menu rata secara horizontal. Pada ukuran mobile, menu navigasi otomatis berubah menjadi tombol hamburger yang bisa membuka dan menutup menu dengan JavaScript sederhana. Setelah itu, saya meng-include berkas navbar.html ke dalam main.html dan halaman-halaman lain yang relevan.
