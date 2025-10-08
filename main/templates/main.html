@@ -7,51 +7,400 @@
 
 {% block content %}
 {% include 'navbar.html' %}
+{% include 'modal.html' %}
+
 <div class="bg-gray-50 w-full pt-16 min-h-screen">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
     <!-- Header Section -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-2">Yuk, belanja di MATCH DAY!</h1>
-      <p class="text-gray-600">Cek barang dari beragam kategori</p>
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Latest Products</h1>
+      <p class="text-gray-600">Stay updated with the latest products!</p>
     </div>
 
-    <!-- Filter Section -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 bg-white rounded-lg border border-gray-200 p-4">
-      <div class="flex space-x-3 mb-4 sm:mb-0">
-        <a href="?" class="{% if request.GET.filter == 'all' or not request.GET.filter  %} bg-green-600 text-white{% else %}bg-white text-gray-700 border border-gray-300{% endif %} px-4 py-2 rounded-md font-medium transition-colors hover:bg-green-600 hover:text-white">
-          All Products
-        </a>
-        <a href="?filter=my" class="{% if request.GET.filter == 'my' %} bg-green-600 text-white{% else %}bg-white text-gray-700 border border-gray-300{% endif %} px-4 py-2 rounded-md font-medium transition-colors hover:bg-green-600 hover:text-white">
-          My Products
-        </a>
-      </div>
-      {% if user.is_authenticated %}
-        <div class="text-sm text-gray-500">
-          Last login: {{ last_login }}
-        </div>
-      {% endif %}
+  <!-- Filter Section -->
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <div class="flex space-x-3">
+      <a id="filter-all" class="bg-green-600 text-white px-4 py-2 rounded-md font-medium transition-colors hover:bg-green-700 cursor-pointer">
+        All Products
+      </a>
+      <a id="filter-my" class="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md font-medium transition-colors hover:bg-green-600 hover:text-white cursor-pointer">
+        My Products
+      </a>
     </div>
+
+    <button id="refresh-products"
+      class="flex items-center bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-md font-medium transition-colors hover:bg-blue-600 hover:text-white cursor-pointer">
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M5 19a9 9 0 0014-7V5"></path>
+      </svg>
+      Refresh
+    </button>
+  </div>
+
+
+    <!-- Loading State -->
+    <div id="loading" class="bg-white rounded-lg border border-gray-200 p-12 text-center hidden">
+      <svg class="animate-spin h-8 w-8 text-green-600 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
+      <p class="text-gray-600 mt-3">Loading products...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error" class="hidden"></div>
 
     <!-- Product Grid -->
-    {% if not product_list %}
-      <div class="bg-white rounded-lg border border-gray-200 p-12 text-center">
-        <div class="w-32 h-32 mx-auto mb-4">
-          <img src="{% static 'image/no-product.png' %}" alt="No products available" class="w-full h-full object-contain">
-        </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">No products found</h3>
-        <p class="text-gray-500 mb-6">Be the first to share products with the community.</p>
-        <a href="{% url 'main:create_product' %}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
-          Create Product
-        </a>
+    <div id="grid" class="hidden"></div>
+
+    <!-- Empty State -->
+    <div id="empty" class="bg-white rounded-lg border border-gray-200 p-12 text-center hidden">
+      <div class="w-32 h-32 mx-auto mb-4">
+        <img src="{% static 'image/no-product.png' %}" alt="No product available" class="w-full h-full object-contain">
       </div>
-    {% else %}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for product in product_list %}
-          {% include 'card_product.html' with product=product %}
-        {% endfor %}
-      </div>
-    {% endif %}
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No product found</h3>
+      <p class="text-gray-500 mb-6">Be the first to share product with the community.</p>
+      <a href="{% url 'main:create_product' %}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+        Add Product
+      </a>
+    </div>
   </div>
 </div>
+
+<script>
+// Configuration
+const PRODUCT_API_ENDPOINT = "{% url 'main:show_json' %}";
+const CURRENT_USER_ID = "{{ user.id|default_if_none:'' }}";
+
+// DOM Elements
+const loadingSpinner = document.getElementById('loading');
+const errorMessage = document.getElementById('error');
+const emptyStateDisplay = document.getElementById('empty');
+const productGridContainer = document.getElementById('grid');
+const showAllProductsButton = document.getElementById('filter-all');
+const showMyProductsButton = document.getElementById('filter-my');
+
+// State Variables
+let activeFilter = 'all';
+let allProductsData = [];
+
+// Update filter button appearance
+function updateFilterButtonsAppearance() {
+  if (!showAllProductsButton || !showMyProductsButton) return;
+  
+  if (activeFilter === 'all') {
+    showAllProductsButton.className = 'bg-green-600 text-white px-4 py-2 rounded-md font-medium transition-colors hover:bg-green-700';
+    showMyProductsButton.className = 'bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md font-medium transition-colors hover:bg-green-600 hover:text-white';
+  } else {
+    showMyProductsButton.className = 'bg-green-600 text-white px-4 py-2 rounded-md font-medium transition-colors hover:bg-green-700';
+    showAllProductsButton.className = 'bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md font-medium transition-colors hover:bg-green-600 hover:text-white';
+  }
+}
+
+// Show/hide page sections
+function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showGrid = false }) {
+  loadingSpinner.classList.toggle('hidden', !showLoading);
+  errorMessage.classList.toggle('hidden', !showError);
+  emptyStateDisplay.classList.toggle('hidden', !showEmpty);
+  productGridContainer.classList.toggle('hidden', !showGrid);
+  
+  if (showGrid) {
+    productGridContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+  }
+}
+
+// Get readable category name
+function getReadableCategoryName(categoryCode) {
+  const categoryMapping = {
+    jersey: 'Jersey',
+    sepatu: 'Sepatu',
+    bola: 'Bola',
+    aksesoris: 'Aksesoris',
+    merch: 'Merch',
+  };
+  return categoryMapping[categoryCode] || categoryCode;
+}
+
+// Create product card element
+function buildProductCardElement(productItem) {
+  const articleElement = document.createElement('article');
+  articleElement.className = 'bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col h-full';
+
+  const detailLink = `{% url 'main:show_product' 0 %}`.replace('0', productItem.id);
+  const editLink = `{% url 'main:edit_product' 0 %}`.replace('0', productItem.id);
+  const deleteLink = `{% url 'main:delete_product' 0 %}`.replace('0', productItem.id);
+
+
+  const categoryLabel = getReadableCategoryName(productItem.category);
+  const isFeatured = productItem.is_featured;
+  const isPopular = productItem.is_product_popular;
+
+  const thumbnailHtml = productItem.thumbnail
+    ? `<img src='${productItem.thumbnail}' alt='${productItem.name}' class='w-full h-full object-cover'>`
+    : `<div class='w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center'>
+         <span class='text-gray-400 text-sm'>No Image</span>
+       </div>`;
+
+  const featuredBadge = isFeatured
+    ? `<span class='inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-800'>Featured</span>`
+    : '';
+  const popularBadge = isPopular
+    ? `<span class='inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800'>Popular</span>`
+    : '';
+
+  const editDeleteButtons = CURRENT_USER_ID && Number(CURRENT_USER_ID) === Number(productItem.user_id)
+    ? `<div class='flex space-x-2'>
+        <a href='#' data-id='${productItem.id}' class='edit-btn text-gray-600 hover:text-gray-700 text-sm transition-colors'>Edit</a>
+        <a href="#" data-id='${productItem.id}' class='delete-btn text-red-600 hover:text-red-700 text-sm transition-colors'>Delete</a>
+      </div>`
+    : '';
+
+  const completeCardHtml = `
+    <div class="aspect-[16/9] relative overflow-hidden">
+      ${thumbnailHtml}
+      <div class="absolute top-3 left-3">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-green-600 text-white">${categoryLabel}</span>
+      </div>
+      <div class="absolute top-3 right-3 flex space-x-2">
+        ${featuredBadge}
+        ${popularBadge}
+      </div>
+    </div>
+    <div class="p-5 flex flex-col flex-1">
+      <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 leading-tight">
+        <a href="${detailLink}" class="hover:text-green-600 transition-colors">${productItem.name}</a>
+      </h3>
+      <p class="text-gray-600 text-sm mb-3 line-clamp-3">${productItem.description || ''}</p>
+      <div class="mt-auto flex items-center justify-between pt-4 border-t border-gray-100">
+        <span class="text-green-700 font-bold">Rp${productItem.price.toLocaleString()}</span>
+        <span class="text-sm text-gray-500">${productItem.stock} in stock</span>
+      </div>
+      <div class="flex items-center justify-between mt-2">
+        <span class="text-yellow-500 text-sm">⭐ ${productItem.rating}</span>
+        ${editDeleteButtons}
+      </div>
+    </div>
+  `;
+
+  articleElement.innerHTML = completeCardHtml;
+  return articleElement;
+}
+
+// Render all product cards
+function renderAllProductCards(productItems) {
+  productGridContainer.innerHTML = '';
+  productItems.forEach(productItem => {
+    const cardElement = buildProductCardElement(productItem);
+    productGridContainer.appendChild(cardElement);
+  });
+}
+
+// Filter and display products
+function filterAndDisplayProducts() {
+  updateFilterButtonsAppearance();
+  
+  const filteredProducts = activeFilter === 'all'
+    ? allProductsData
+    : allProductsData.filter(product => Number(product.user_id) === Number(CURRENT_USER_ID));
+  
+  if (filteredProducts.length === 0) {
+    displayPageSection({ showEmpty: true });
+  } else {
+    renderAllProductCards(filteredProducts);
+    displayPageSection({ showGrid: true });
+  }
+}
+
+// Fetch product data from server
+async function fetchProductsFromServer() {
+  try {
+    displayPageSection({ showLoading: true });
+    
+    const response = await fetch(PRODUCT_API_ENDPOINT, {
+      headers: { 'Accept': 'application/json' },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch product data from server');
+    }
+
+    const productData = await response.json();
+    allProductsData = productData || [];
+    
+    filterAndDisplayProducts();
+  } catch (error) {
+    console.error('Error loading products:', error);
+    displayPageSection({ showError: true });
+  }
+}
+
+// Event handlers
+function handleShowAllProductsClick() {
+  activeFilter = 'all';
+  filterAndDisplayProducts();
+}
+
+function handleShowMyProductsClick() {
+  activeFilter = 'my';
+  filterAndDisplayProducts();
+}
+
+// Initialize page
+function initializeProductPage() {
+  showAllProductsButton.addEventListener('click', handleShowAllProductsClick);
+  showMyProductsButton.addEventListener('click', handleShowMyProductsClick);
+  
+  fetchProductsFromServer();
+}
+
+// Start application
+initializeProductPage();
+
+// Add event listener to detect new news
+document.addEventListener('newsAdded', function() {
+    // Refresh data without page reload
+    fetchNewsFromServer();
+});
+
+// Handle refresh click 
+const refreshButton = document.getElementById('refresh-products');
+refreshButton.addEventListener('click', async () => {
+  showToast("Refreshing", "Fetching latest product data...", "info");
+  await fetchProductsFromServer();
+  showToast("Refreshed", "Product list updated!", "success");
+});
+
+</script>
+
+<script>
+// ===== EDIT MODAL SETUP =====
+const modal = document.getElementById('edit-product-modal');
+const cancelBtn = document.getElementById('cancel-edit');
+const editForm = document.getElementById('edit-product-form');
+
+// === Show modal when "Edit" clicked ===
+document.addEventListener('click', async (e) => {
+  if (e.target.classList.contains('edit-btn')) {
+    e.preventDefault();
+    const productId = e.target.getAttribute('data-id');
+
+    try {
+      const response = await fetch(`/get_product/${productId}/`);
+      const data = await response.json();
+      if (!response.ok || data.error) throw new Error(data.error || "Failed to fetch");
+
+      // Prefill fields
+      document.getElementById('edit-product-id').value = data.id;
+      document.getElementById('edit-name').value = data.name;
+      document.getElementById('edit-price').value = data.price;
+      document.getElementById('edit-stock').value = data.stock;
+      document.getElementById('edit-category').value = data.category.toLowerCase();
+      document.getElementById('edit-thumbnail').value = data.thumbnail || '';
+
+      // Optional: if you added rating/description/is_featured in modal
+      if (document.getElementById('edit-description'))
+        document.getElementById('edit-description').value = data.description || '';
+      if (document.getElementById('edit-rating'))
+        document.getElementById('edit-rating').value = data.rating || 0;
+      if (document.getElementById('edit-is_featured'))
+        document.getElementById('edit-is_featured').checked = data.is_featured;
+
+      modal.classList.remove('hidden');
+    } catch (err) {
+      showToast("Error", "Failed to load product data", "error");
+    }
+  }
+});
+
+// === Hide modal ===
+cancelBtn.addEventListener('click', () => {
+  modal.classList.add('hidden');
+});
+
+// === Handle AJAX submit ===
+editForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(editForm);
+  const productId = formData.get('id');
+
+  try {
+    const response = await fetch(`/edit_product/${productId}/`, {
+      method: "POST",
+      headers: { "X-CSRFToken": formData.get('csrfmiddlewaretoken') },
+      body: formData,
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || result.error) throw new Error(result.error || "Update failed");
+
+    showToast("Success", "Product updated successfully!", "success");
+    modal.classList.add('hidden');
+    fetchProductsFromServer(); // refresh product grid
+  } catch (err) {
+    showToast("Error", err.message || "Failed to update product", "error");
+  }
+});
+</script>
+
+<script>
+let productToDelete = null; // buat nyimpen ID produk yang mau dihapus
+const deleteModal = document.getElementById('delete-confirmation-modal');
+const cancelDeleteBtn = document.getElementById('cancel-delete');
+const confirmDeleteBtn = document.getElementById('confirm-delete');
+
+// === Tampilkan modal konfirmasi saat klik Delete ===
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('delete-btn')) {
+    e.preventDefault();
+    productToDelete = e.target.dataset.id;
+    deleteModal.classList.remove('hidden');
+  }
+});
+
+// === Tutup modal ===
+cancelDeleteBtn.addEventListener('click', () => {
+  deleteModal.classList.add('hidden');
+  productToDelete = null;
+});
+
+// === Konfirmasi hapus (AJAX) ===
+confirmDeleteBtn.addEventListener('click', async () => {
+  if (!productToDelete) return;
+
+  try {
+    const response = await fetch(`/delete_product/${productToDelete}/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": getCSRFToken(), // ambil token dari cookie
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || result.error) throw new Error(result.error || "Failed to delete product");
+
+    deleteModal.classList.add('hidden');
+    showToast("Success", "Product deleted successfully!", "success");
+    fetchProductsFromServer(); // refresh tampilan produk
+  } catch (err) {
+    showToast("Error", err.message || "Failed to delete product", "error");
+  } finally {
+    productToDelete = null;
+  }
+});
+
+// === Ambil CSRF token dari cookie ===
+function getCSRFToken() {
+  const name = "csrftoken=";
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    cookie = cookie.trim();
+    if (cookie.startsWith(name)) return cookie.substring(name.length);
+  }
+  return "";
+}
+</script>
+
+
 {% endblock content %}

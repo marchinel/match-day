@@ -1,4 +1,3 @@
-import uuid
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -10,7 +9,7 @@ class Product(models.Model):
         ('sepatu', 'Sepatu'),
         ('bola', 'Bola'),
         ('aksesoris', 'Aksesoris'),
-        ('merchandise', 'Merchandise'),
+        ('merch', 'Merch'),
     ]
 
     name = models.CharField(max_length=100)

@@ -39,7 +39,7 @@
 
 
   <!-- Content -->
-  <div class="p-4 flex flex-col flex-grow">
+  <div class="p-2 flex flex-col flex-grow">
     <!-- Nama Produk -->
     <h2 class="text-lg text-gray-900 mb-1">{{ product.name }}</h2>
 
@@ -51,7 +51,7 @@
     <!-- Rating -->
     <div class="flex items-center">
       <span class="text-yellow-500 text-lg">★</span>
-      <span class="ml-2 text-gray-800 text-base">{{ product.rating }}</span>
+      <span class="ml-2 text-gray-800 text-base">{{ product.rating }}/5.0</span>
     </div>
 
     <!-- Action Buttons -->
@@ -59,7 +59,7 @@
       {% if user.is_authenticated and product.user == user %}
         <div class="flex items-center justify-between">
           <a href="{% url 'main:show_product' product.id %}" class="text-green-600 hover:text-green-700 font-medium text-sm transition-colors">
-            See Details
+            ...
           </a>
           <div class="flex space-x-2">
             <a href="{% url 'main:edit_product' product.id %}" class="text-gray-600 hover:text-gray-700 text-sm transition-colors">
@@ -72,7 +72,7 @@
         </div>
       {% else %}
         <a href="{% url 'main:show_product' product.id %}" class="text-green-600 hover:text-green-700 font-medium text-sm transition-colors">
-          See Details 
+          ...
         </a>
       {% endif %}
     </div>

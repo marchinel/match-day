@@ -1,11 +1,13 @@
 {% load static %}
+{% csrf_token %}
+
 <nav class="fixed top-0 left-0 w-full bg-white border-b border-gray-200 shadow-sm z-50">
     <div class="max-w-7xl mx-auto px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center">
           <a href="{% url 'main:show_main' %}" class="flex items-center space-x-2">
               <img src="{% static 'image/logo.png' %}" alt="Logo" class="h-8 w-8 object-contain">
-              <h1 class="text-2xl font-semibold text-gray-900">
+              <h1 class="text-3xl font-semibold text-gray-900">
                 <span class="text-green-700">MATCH DAY</span>
               </h1>
             </a>
@@ -13,23 +15,25 @@
         
         <!-- Desktop Navigation -->
         <div class="hidden md:flex items-center space-x-8">
-          <a href="/" class="text-gray-600 hover:text-green-800 font-medium transition-colors">
+          <a href="/" class="{% if request.resolver_match.url_name == 'show_main' %}text-green-700{% else %}text-gray-600 hover:text-green-700{% endif %} font-medium transition-colors">
             Home
           </a>
-          <a href="{% url 'main:products_by_category' 'jersey'%}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+          <a href="{% url 'main:products_by_category' 'jersey'%}" class="{% if request.resolver_match.url_name == 'products_by_category' and request.resolver_match.kwargs.category == 'jersey' %}text-green-700{% else %}text-gray-600 hover:text-green-700{% endif %} font-medium transition-colors">
             Jersey
           </a>
-          <a href="{% url 'main:products_by_category' 'sepatu'%}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+          <a href="{% url 'main:products_by_category' 'sepatu'%}" class="{% if request.resolver_match.url_name == 'products_by_category' and request.resolver_match.kwargs.category == 'sepatu' %}text-green-700{% else %}text-gray-600 hover:text-green-700{% endif %} font-medium transition-colors">
             Sepatu
           </a>
-          <a href="{% url 'main:products_by_category' 'aksesoris'%}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+          <a href="{% url 'main:products_by_category' 'aksesoris'%}" class="{% if request.resolver_match.url_name == 'products_by_category' and request.resolver_match.kwargs.category == 'aksesoris' %}text-green-700{% else %}text-gray-600 hover:text-green-700{% endif %} font-medium transition-colors">
             Aksesoris
           </a>
-          <a href="{% url 'main:products_by_category' 'merchandise'%}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
-            Merchandise
+          <a href="{% url 'main:products_by_category' 'merch'%}" class="{% if request.resolver_match.url_name == 'products_by_category' and request.resolver_match.kwargs.category == 'merch' %}text-green-700{% else %}text-gray-600 hover:text-green-700{% endif %} font-medium transition-colors">
+            Merch
           </a>
-          <a href="{% url 'main:create_product' %}" class="text-gray-600 hover:text-green-700 font-medium transition-colors">
-           Add Product
+          <a href="#" 
+            onclick="event.preventDefault(); showModal();" 
+            class="text-gray-600 hover:text-green-700 font-medium transition-colors">
+            Add Product
           </a>
         </div>
         
@@ -40,9 +44,9 @@
               <div class="text-sm font-medium text-gray-900">{{ name|default:user.username }}</div>
               <div class="text-xs text-gray-500">{{ npm|default:"Student" }} - {{ class|default:"Class" }}</div>
             </div>
-            <a href="{% url 'main:logout' %}" class="text-red-600 hover:text-red-700 font-medium transition-colors">
-              Logout
-            </a>
+        <a href="#" id="logoutBtn" class="text-red-600 hover:text-red-700 font-medium transition-colors">
+          Logout
+        </a>
           {% else %}
             <a href="{% url 'main:login' %}" class="text-gray-600 hover:text-gray-900 font-medium transition-colors">
               Login
@@ -71,22 +75,24 @@
       <div class="px-6 py-4 space-y-4">
         <!-- Mobile Navigation Links -->
         <div class="space-y-1">
-          <a href="/" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+          <a href="/" class="{% if request.resolver_match.url_name == 'show_main' %}text-green-700{% else %}text-gray-600 hover:text-green-800{% endif %} font-medium transition-colors">
             Home
           </a>
-          <a href="{% url 'main:products_by_category' 'jersey'%}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+          <a href="{% url 'main:products_by_category' 'jersey'%}" class="block {% if request.resolver_match.url_name == 'products_by_category' and request.resolver_match.kwargs.category == 'jersey' %}text-green-700{% else %}text-gray-600 hover:text-green-700{% endif %} font-medium py-3 transition-colors">
             Jersey
           </a>
-          <a href="{% url 'main:products_by_category' 'sepatu'%}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+          <a href="{% url 'main:products_by_category' 'sepatu'%}" class="block {% if request.resolver_match.url_name == 'products_by_category' and request.resolver_match.kwargs.category == 'sepatu' %}text-green-700{% else %}text-gray-600 hover:text-green-700{% endif %} font-medium py-3 transition-colors">
             Sepatu
           </a>
-          <a href="{% url 'main:products_by_category' 'aksesoris'%}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+          <a href="{% url 'main:products_by_category' 'aksesoris'%}" class="block {% if request.resolver_match.url_name == 'products_by_category' and request.resolver_match.kwargs.category == 'aksesoris' %}text-green-700{% else %}text-gray-600 hover:text-green-700{% endif %} font-medium py-3 transition-colors">
             Aksesoris
           </a>
-          <a href="{% url 'main:products_by_category' 'merchandise'%}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
-            Merchandise
+          <a href="{% url 'main:products_by_category' 'merch'%}" class="block {% if request.resolver_match.url_name == 'products_by_category' and request.resolver_match.kwargs.category == 'merch' %}text-green-700{% else %}text-gray-600 hover:text-green-700{% endif %} font-medium py-3 transition-colors">
+            Merch
           </a>
-          <a href="{% url 'main:create_product' %}" class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
+          <a href="#" 
+            onclick="event.preventDefault(); showModal();" 
+            class="block text-gray-600 hover:text-green-900 font-medium py-3 transition-colors">
             Add Product
           </a>
         </div>
@@ -98,9 +104,9 @@
               <div class="font-medium text-gray-900">{{ name|default:user.username }}</div>
               <div class="text-sm text-gray-500">{{ npm|default:"Student" }} - {{ class|default:"Class" }}</div>
             </div>
-            <a href="{% url 'main:logout' %}" class="block text-red-600 hover:text-red-700 font-medium py-3 transition-colors">
-              Logout
-            </a>
+        <a href="#" id="logoutBtn" class="text-red-600 hover:text-red-700 font-medium transition-colors">
+          Logout
+        </a>
           {% else %}
             <div class="space-y-3">
               <a href="{% url 'main:login' %}" class="block text-gray-600 hover:text-gray-900 font-medium py-3 transition-colors">
@@ -122,4 +128,37 @@
         menu.classList.toggle("hidden");
       });
     </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const logoutBtn = document.getElementById("logoutBtn");
+        if (!logoutBtn) return;
+
+        logoutBtn.addEventListener("click", async (e) => {
+          e.preventDefault();
+
+          try {
+            const response = await fetch("{% url 'main:logout' %}", {
+              method: "POST",
+              headers: {
+                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]")?.value || "",
+                "X-Requested-With": "XMLHttpRequest"
+              }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              showToast("Logout Successful", "You have been logged out.", "success");
+              setTimeout(() => window.location.href = "{% url 'main:login' %}", 1200);
+            } else {
+              showToast("Logout Failed", data.message || "Something went wrong.", "error");
+            }
+
+          } catch (err) {
+            showToast("Error", "Failed to logout. Please try again.", "error");
+          }
+        });
+      });
+    </script>
+
   </nav>

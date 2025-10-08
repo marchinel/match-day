@@ -250,3 +250,10 @@ Kemudian, saya melakukan kustomisasi halaman login, register, tambah produk, edi
 Selanjutnya, saya mengkustomisasi halaman daftar product agar lebih menarik dan responsif. Pertama, saya menambahkan kondisi di main.html. Jika database belum memiliki produk, halaman akan menampilkan gambar no-product.png (saya menaruhnya di direktori static/image) beserta pesan bahwa belum ada produk yang terdaftar. Jika sudah ada produk, setiap produk akan ditampilkan menggunakan card yang saya buat di card_product.html. Pada card ini, saya menambahkan tombol edit dan delete sesuai fungsionalitas yang sudah diimplementasikan sebelumnya. Dengan penggunaan Tailwind, tampilan card menjadi lebih responsif dan menyesuaikan ukuran layar perangkat.
 
 Untuk bagian navigasi, saya membuat navigation bar (navbar) pada berkas navbar.html di direktori templates. Navbar ini berisi link menuju halaman utama, halaman tambah produk, serta tombol login, register, atau logout tergantung status autentikasi pengguna. Saya menggunakan utility class Tailwind untuk membuat navbar fixed di bagian atas halaman, dengan struktur flexbox agar menu rata secara horizontal. Pada ukuran mobile, menu navigasi otomatis berubah menjadi tombol hamburger yang bisa membuka dan menutup menu dengan JavaScript sederhana. Setelah itu, saya meng-include berkas navbar.html ke dalam main.html dan halaman-halaman lain yang relevan.
+
+-- Tugas 6 --
+1. Apa perbedaan antara synchronous request dan asynchronous request?
+2. Bagaimana AJAX bekerja di Django (alur request–response)?
+3. Apa keuntungan menggunakan AJAX dibandingkan render biasa di Django?
+4. Bagaimana cara memastikan keamanan saat menggunakan AJAX untuk fitur Login dan Register di Django?
+5. Bagaimana AJAX mempengaruhi pengalaman pengguna (User Experience) pada website?

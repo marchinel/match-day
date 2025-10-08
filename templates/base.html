@@ -4,12 +4,36 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    {% block meta %} {% endblock meta %}
-    <link rel="icon" href="{% static 'image/logo.png' %}" type="image/png">
+    {% block meta %}{% endblock meta %}
+
+    <!-- Tailwind config & CDN -->
+    <script>
+      // Pastikan Tailwind dikonfigurasi sebelum di-load
+      tailwind = {
+        config: {
+          theme: {
+            extend: {},
+          },
+        },
+      };
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{% static 'css/global.css' %}"/>
+
+    <!-- Favicon & Global Style -->
+    <link rel="icon" href="{% static 'image/logo.png' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}" />
+
+    <!-- DOMPurify (buat sanitasi input HTML dinamis, aman dari XSS) -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
   </head>
-  <body>
-    {% block content %} {% endblock content %}
+
+  <body class="bg-gray-50 text-gray-900">
+    {% block content %}{% endblock %}
+
+    <!-- Toast template (kalau kamu include toast.html) -->
+    {% include 'toast.html' %}
+
+    <!-- Slot buat script tambahan di tiap halaman -->
+    {% block scripts %}{% endblock %}
   </body>
 </html>
