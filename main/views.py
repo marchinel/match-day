@@ -15,6 +15,11 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils.html import strip_tags
+import requests
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.html import strip_tags
+import json
+from django.http import JsonResponse
 
 
 @login_required(login_url='/login')
@@ -252,7 +257,7 @@ def add_product_entry_ajax(request):
     thumbnail = request.POST.get("thumbnail")
     category = request.POST.get("category")
     stock = request.POST.get("stock")
-    is_featured = request.POST.get("is_featured") == 'on'  # Checkbox handling
+    is_featured = request.POST.get("is_featured") == 'on'
     user = request.user if request.user.is_authenticated else None
 
     new_product = Product(
@@ -264,8 +269,59 @@ def add_product_entry_ajax(request):
         category=category,
         is_featured=is_featured,
         stock=stock,
-        rating=rating,
+        # JANGAN KIRIM rating kalau None
+        # Kalau rating tidak dikirim, Django akan isi default=0
     )
+
+    # Jika rating ada nilainya, baru kirim
+    if rating:
+        new_product.rating = rating
+
     new_product.save()
 
     return HttpResponse(b"CREATED", status=201)
+
+
+def proxy_image(request):
+    image_url = request.GET.get('url')
+    if not image_url:
+        return HttpResponse('No URL provided', status=400)
+    
+    try:
+        # Fetch image from external source
+        response = requests.get(image_url, timeout=10)
+        response.raise_for_status()
+        
+        # Return the image with proper content type
+        return HttpResponse(
+            response.content,
+            content_type=response.headers.get('Content-Type', 'image/jpeg')
+        )
+    except requests.RequestException as e:
+        return HttpResponse(f'Error fetching image: {str(e)}', status=500)
+
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+
+            new_product = Product(
+                user=request.user if request.user.is_authenticated else None,
+                name=data.get("name"),
+                price=data.get("price"),
+                description=data.get("description"),
+                thumbnail=data.get("thumbnail"),
+                category=data.get("category"),
+                is_featured=data.get("is_featured", False),
+                stock=data.get("stock"),
+                rating=float(data.get("rating", 0)),  # pastikan float
+            )
+
+            new_product.save()
+            return JsonResponse({"status": "success"}, status=200)
+
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+    return JsonResponse({"status": "error"}, status=401)
